@@ -13,44 +13,50 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            /* لوحة الألوان الداكنة — بنفسجي + تركواز */
-            --primary: #8b5cf6;
-            --primary-dark: #7c3aed;
+            /* لوحة ألوان داكنة كحلية — مستوحاة من الصورة */
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
             --primary-light: #a78bfa;
-            --accent: #22d3ee;
-            --accent-dark: #06b6d4;
-            --accent-light: #67e8f9;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+            --accent-light: #60a5fa;
+            --accent-glow: #1e40af;
 
-            --success: #34d399;
-            --danger: #f87171;
-            --warning: #fbbf24;
-            --info: #60a5fa;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
 
-            --bg: #0f0d1a;
-            --bg2: #16132a;
-            --card: #1e1a33;
-            --card2: #252140;
-            --text: #f1f0ff;
-            --text2: #a5a1c2;
-            --text3: #6b6885;
-            --border: #2f2a4a;
-            --border-soft: #262140;
+            --bg: #0a0e1f;
+            --bg2: #0f1629;
+            --card: #131b2e;
+            --card2: #1a2440;
+            --card3: #1e2a4a;
 
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 22px;
-            --radius-xl: 28px;
+            --text: #e8ecf5;
+            --text2: #94a3b8;
+            --text3: #64748b;
 
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 16px rgba(139, 92, 246, 0.15);
-            --shadow-lg: 0 12px 32px rgba(139, 92, 246, 0.25);
-            --shadow-xl: 0 24px 60px rgba(139, 92, 246, 0.3);
+            --border: #1e3a5f;
+            --border-glow: #2563eb;
+            --border-soft: #1a2942;
+
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-pill: 999px;
+
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+            --shadow-md: 0 4px 20px rgba(37, 99, 235, 0.15);
+            --shadow-lg: 0 12px 40px rgba(37, 99, 235, 0.25);
+            --shadow-xl: 0 24px 60px rgba(124, 58, 237, 0.35);
         }
 
         html, body { height: 100%; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Noto Sans Arabic', sans-serif;
             background: var(--bg);
             color: var(--text);
             direction: rtl;
@@ -60,19 +66,40 @@
             position: relative;
         }
 
-        /* خلفية بألوان شعاعية ناعمة داكنة */
+        /* خلفية بألوان شعاعية */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             z-index: -1;
             background:
-                radial-gradient(circle at 12% 8%, rgba(139, 92, 246, 0.18) 0%, transparent 42%),
-                radial-gradient(circle at 88% 12%, rgba(34, 211, 238, 0.15) 0%, transparent 42%),
-                radial-gradient(circle at 50% 95%, rgba(167, 139, 250, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 95% 75%, rgba(103, 232, 249, 0.12) 0%, transparent 40%);
+                radial-gradient(circle at 15% 10%, rgba(37, 99, 235, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 85% 15%, rgba(124, 58, 237, 0.16) 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 90% 80%, rgba(167, 139, 250, 0.12) 0%, transparent 40%);
             pointer-events: none;
         }
+
+        /* ============================================
+           Animated Glow Ring for Icons (شعاع متحول)
+           ============================================ */
+        @keyframes glowShift {
+            0%   { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.55), 0 0 18px 2px rgba(59, 130, 246, 0.45), inset 0 0 12px rgba(59,130,246,0.15); }
+            25%  { box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.55), 0 0 18px 2px rgba(124, 58, 237, 0.45), inset 0 0 12px rgba(124,58,237,0.15); }
+            50%  { box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.55),  0 0 18px 2px rgba(6, 182, 212, 0.45),  inset 0 0 12px rgba(6,182,212,0.15); }
+            75%  { box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.55), 0 0 18px 2px rgba(236, 72, 153, 0.45), inset 0 0 12px rgba(236,72,153,0.15); }
+            100% { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.55), 0 0 18px 2px rgba(59, 130, 246, 0.45), inset 0 0 12px rgba(59,130,246,0.15); }
+        }
+
+        @keyframes glowShiftSlow {
+            0%   { box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.5), 0 0 22px 3px rgba(124, 58, 237, 0.4); }
+            33%  { box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.5),  0 0 22px 3px rgba(6, 182, 212, 0.4); }
+            66%  { box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.5), 0 0 22px 3px rgba(236, 72, 153, 0.4); }
+            100% { box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.5), 0 0 22px 3px rgba(124, 58, 237, 0.4); }
+        }
+
+        .glow-ring { animation: glowShift 4s linear infinite; }
+        .glow-ring-slow { animation: glowShiftSlow 6s linear infinite; }
 
         /* ============================================
            Auth View
@@ -102,9 +129,8 @@
             align-items: center;
             justify-content: center;
             font-size: 40px;
-            box-shadow: 0 20px 48px rgba(139, 92, 246, 0.5);
-            animation: floatIcon 3.5s ease-in-out infinite;
             color: #fff;
+            animation: floatIcon 3.5s ease-in-out infinite, glowShiftSlow 6s linear infinite;
         }
 
         @keyframes floatIcon {
@@ -115,11 +141,11 @@
         .auth-brand h1 {
             font-size: 26px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-light), var(--primary-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -0.5px;
         }
 
         .auth-brand p {
@@ -142,6 +168,7 @@
             border-radius: var(--radius-md);
             padding: 4px;
             margin-bottom: 22px;
+            border: 1px solid var(--border-soft);
         }
 
         .auth-tab {
@@ -151,16 +178,16 @@
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            border-radius: 12px;
+            border-radius: 14px;
             color: var(--text2);
             transition: 0.25s;
             user-select: none;
         }
 
         .auth-tab.active {
-            background: var(--card2);
-            color: var(--primary-light);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(59,130,246,0.25));
+            color: #fff;
+            box-shadow: 0 0 0 1px rgba(59,130,246,0.4), 0 4px 14px rgba(59,130,246,0.3);
         }
 
         .form-group { margin-bottom: 14px; }
@@ -178,7 +205,7 @@
             width: 100%;
             padding: 14px 16px;
             border: 1.5px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-pill);
             font-size: 15px;
             transition: 0.2s;
             background: var(--bg2);
@@ -190,8 +217,8 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+            border-color: var(--border-glow);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18), 0 0 20px rgba(59,130,246,0.25);
         }
 
         .form-group input[dir="ltr"] { direction: ltr; text-align: left; }
@@ -200,7 +227,7 @@
             width: 100%;
             padding: 15px;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-pill);
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
@@ -219,13 +246,18 @@
         .auth-btn.primary {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
-            box-shadow: 0 10px 24px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35), 0 0 0 1px rgba(124,58,237,0.3);
         }
 
         .auth-btn.google {
             background: var(--card2);
             color: var(--text);
             border: 1.5px solid var(--border);
+        }
+
+        .auth-btn.google:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 0 20px rgba(59,130,246,0.2);
         }
 
         .auth-msg {
@@ -238,8 +270,8 @@
         }
 
         .auth-msg.show { display: block; }
-        .auth-msg.error { background: rgba(248, 113, 113, 0.15); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.3); }
-        .auth-msg.success { background: rgba(52, 211, 153, 0.15); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.3); }
+        .auth-msg.error { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.35); }
+        .auth-msg.success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16,185,129,0.35); }
 
         .auth-loader { display: none; text-align: center; padding: 10px; }
         .auth-loader.show { display: block; }
@@ -247,7 +279,7 @@
         .spin {
             width: 28px; height: 28px;
             border: 3px solid var(--border-soft);
-            border-top-color: var(--primary);
+            border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
             margin: 0 auto;
@@ -279,7 +311,7 @@
         .auth-link {
             text-align: center;
             font-size: 13px;
-            color: var(--primary-light);
+            color: var(--accent-light);
             cursor: pointer;
             margin-top: 8px;
             font-weight: 700;
@@ -295,13 +327,14 @@
         }
 
         /* ============================================
-           App View (Dashboard)
+           App View
            ============================================ */
         #appView { display: none; min-height: 100vh; flex-direction: column; }
 
-        /* Topbar */
         .topbar {
-            background: var(--card);
+            background: rgba(19, 27, 46, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border-soft);
             padding: 14px 16px;
             display: flex;
@@ -311,32 +344,30 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
         }
 
         .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
 
         .topbar-left .brand-icon {
             width: 46px; height: 46px;
-            border-radius: 14px;
+            border-radius: 16px;
             background: linear-gradient(135deg, var(--primary), var(--accent));
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 22px;
             color: #fff;
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
             flex-shrink: 0;
         }
 
         .topbar-left h1 {
             font-size: 17px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, var(--accent-light), var(--primary-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -0.3px;
         }
 
         .topbar-left .sub {
@@ -368,7 +399,7 @@
         }
 
         .icon-btn:active { transform: scale(0.92); }
-        .icon-btn:hover { background: var(--border); }
+        .icon-btn:hover { border-color: var(--border-glow); }
 
         .avatar-btn {
             width: 46px; height: 46px;
@@ -382,12 +413,11 @@
             font-size: 18px;
             cursor: pointer;
             border: none;
-            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+            animation: glowShift 5s linear infinite;
         }
 
         .avatar-btn:active { transform: scale(0.92); }
 
-        /* Main content */
         .main {
             flex: 1;
             max-width: 720px;
@@ -396,7 +426,6 @@
             padding: 16px 14px 120px;
         }
 
-        /* Stats grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -416,22 +445,22 @@
             transition: 0.2s;
         }
 
-        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border); }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-md);
+        }
 
         .stat-icon {
             width: 52px; height: 52px;
-            border-radius: 16px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             flex-shrink: 0;
+            background: var(--bg2);
         }
-
-        .stat-icon.purple { background: rgba(139, 92, 246, 0.18); color: var(--primary-light); }
-        .stat-icon.cyan { background: rgba(34, 211, 238, 0.18); color: var(--accent-light); }
-        .stat-icon.green { background: rgba(52, 211, 153, 0.18); color: var(--success); }
-        .stat-icon.orange { background: rgba(251, 191, 36, 0.18); color: var(--warning); }
 
         .stat-info { min-width: 0; }
 
@@ -450,7 +479,6 @@
             margin-top: 3px;
         }
 
-        /* Tabs */
         .tabs-row {
             display: flex;
             gap: 8px;
@@ -464,7 +492,7 @@
 
         .tab-pill {
             padding: 10px 18px;
-            border-radius: 40px;
+            border-radius: var(--radius-pill);
             background: var(--card);
             border: 1.5px solid var(--border);
             font-size: 13px;
@@ -483,12 +511,11 @@
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
             border-color: transparent;
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 8px 22px rgba(59, 130, 246, 0.4);
         }
 
         .tab-pill:active { transform: scale(0.96); }
 
-        /* Card */
         .card {
             background: var(--card);
             border-radius: var(--radius-lg);
@@ -519,38 +546,37 @@
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
             font-size: 11px;
-            padding: 3px 10px;
-            border-radius: 40px;
+            padding: 3px 12px;
+            border-radius: var(--radius-pill);
             font-weight: 800;
         }
 
-        .badge.success { background: var(--success); color: #0f0d1a; }
-        .badge.warning { background: var(--warning); color: #0f0d1a; }
-        .badge.danger { background: var(--danger); color: #0f0d1a; }
+        .badge.success { background: var(--success); color: #041a12; }
+        .badge.warning { background: var(--warning); color: #1a1004; }
+        .badge.danger { background: var(--danger); color: #1a0404; }
 
-        /* Drop Zone */
         .drop-zone {
-            border: 2px dashed var(--primary-light);
+            border: 2px dashed rgba(96, 165, 250, 0.55);
             border-radius: var(--radius-lg);
             padding: 36px 20px;
             text-align: center;
             cursor: pointer;
             transition: 0.25s;
-            background: rgba(139, 92, 246, 0.06);
+            background: rgba(59, 130, 246, 0.06);
             margin-bottom: 14px;
         }
 
         .drop-zone:hover, .drop-zone.drag-over {
-            border-color: var(--accent);
-            background: rgba(34, 211, 238, 0.08);
+            border-color: var(--accent-light);
+            background: rgba(59, 130, 246, 0.12);
             transform: scale(1.01);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.25);
         }
 
         .drop-zone .icon { font-size: 52px; margin-bottom: 10px; display: block; }
         .drop-zone .text { font-size: 15px; color: var(--text); font-weight: 700; }
         .drop-zone .hint { font-size: 12px; color: var(--text2); margin-top: 6px; }
 
-        /* Preview */
         .preview {
             display: none;
             position: relative;
@@ -576,7 +602,7 @@
             left: 12px;
             width: 38px; height: 38px;
             border-radius: 50%;
-            background: rgba(248, 113, 113, 0.95);
+            background: rgba(239, 68, 68, 0.95);
             color: #fff;
             border: none;
             font-size: 18px;
@@ -584,7 +610,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
         .preview .remove-btn:active { transform: scale(0.9); }
@@ -594,7 +620,7 @@
             justify-content: space-between;
             padding: 12px 16px;
             background: var(--bg2);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-pill);
             font-size: 12px;
             color: var(--text);
             font-weight: 700;
@@ -604,12 +630,11 @@
             border: 1px solid var(--border-soft);
         }
 
-        /* Buttons */
         .btn {
             width: 100%;
             padding: 16px;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-pill);
             font-size: 15px;
             font-weight: 800;
             cursor: pointer;
@@ -628,7 +653,7 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
-            box-shadow: 0 10px 24px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 10px 26px rgba(59, 130, 246, 0.4);
         }
 
         .btn-outline {
@@ -637,7 +662,6 @@
             border: 1.5px solid var(--border);
         }
 
-        /* Loader */
         .loader {
             display: none;
             text-align: center;
@@ -648,8 +672,8 @@
 
         .loader .spinner {
             width: 36px; height: 36px;
-            border: 3px solid rgba(139, 92, 246, 0.2);
-            border-top-color: var(--primary);
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
             margin: 0 auto 10px;
@@ -657,13 +681,12 @@
 
         .loader .txt { font-size: 13px; color: var(--text2); font-weight: 700; }
 
-        /* Result */
         .result {
             display: none;
             padding: 18px;
             border-radius: var(--radius-lg);
-            background: rgba(52, 211, 153, 0.1);
-            border: 1.5px solid rgba(52, 211, 153, 0.35);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1.5px solid rgba(16, 185, 129, 0.4);
             margin-top: 12px;
         }
 
@@ -675,8 +698,8 @@
         }
 
         .result.error {
-            background: rgba(248, 113, 113, 0.1);
-            border-color: rgba(248, 113, 113, 0.35);
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.4);
         }
 
         .result .title {
@@ -719,7 +742,7 @@
         .result .actions button {
             padding: 12px 8px;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-pill);
             font-size: 13px;
             font-weight: 800;
             cursor: pointer;
@@ -729,15 +752,15 @@
             justify-content: center;
             gap: 4px;
             transition: 0.15s;
+            color: #fff;
         }
 
         .result .actions button:active { transform: scale(0.95); }
 
-        .btn-copy { background: var(--primary); color: #fff; }
-        .btn-open { background: var(--success); color: #0f0d1a; }
-        .btn-img { background: var(--warning); color: #0f0d1a; }
+        .btn-copy { background: var(--primary); }
+        .btn-open { background: var(--success); }
+        .btn-img { background: var(--warning); }
 
-        /* Gallery */
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -763,7 +786,7 @@
         .gallery-item:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-md);
-            border-color: var(--primary);
+            border-color: var(--border-glow);
         }
 
         .gallery-item img {
@@ -782,14 +805,14 @@
             font-size: 10px;
             font-weight: 800;
             padding: 4px 10px;
-            border-radius: 40px;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.5);
+            border-radius: var(--radius-pill);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
         }
 
         .gallery-item .overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, transparent 45%, rgba(15, 13, 26, 0.95) 100%);
+            background: linear-gradient(180deg, transparent 45%, rgba(10, 14, 31, 0.95) 100%);
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -826,17 +849,17 @@
             flex: 1;
             padding: 6px 0;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 12px;
             font-weight: 800;
             cursor: pointer;
             font-family: inherit;
             background: rgba(255, 255, 255, 0.95);
-            color: var(--text);
+            color: #0a0e1f;
         }
 
         .gallery-item .actions .del {
-            background: rgba(248, 113, 113, 0.95);
+            background: rgba(239, 68, 68, 0.95);
             color: #fff;
         }
 
@@ -850,7 +873,6 @@
         .empty .big { font-size: 60px; display: block; margin-bottom: 12px; opacity: 0.5; }
         .empty p { font-size: 14px; }
 
-        /* History rows */
         .history-list { display: flex; flex-direction: column; gap: 10px; }
 
         .history-row {
@@ -864,13 +886,17 @@
             transition: 0.2s;
         }
 
-        .history-row:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); border-color: var(--primary); }
+        .history-row:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+            border-color: var(--border-glow);
+        }
 
         .history-row .h-icon {
             width: 46px; height: 46px;
-            border-radius: 14px;
-            background: rgba(139, 92, 246, 0.15);
-            color: var(--primary-light);
+            border-radius: 16px;
+            background: var(--bg2);
+            color: var(--accent-light);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -902,16 +928,18 @@
         .history-row .h-status {
             font-size: 10px;
             font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 40px;
-            background: rgba(52, 211, 153, 0.15);
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            background: rgba(16, 185, 129, 0.15);
             color: var(--success);
             flex-shrink: 0;
         }
 
         /* ============================================
-           AD BANNER — إعلان غير مزعج أسفل الشاشة
+           ADS — الإعلان القديم (أسفل الشاشة) + الجديد (داخل الصفحة)
            ============================================ */
+
+        /* Old fixed ad */
         .ad-banner-bottom {
             position: fixed;
             bottom: 70px;
@@ -919,18 +947,18 @@
             right: 0;
             background: var(--card);
             border-top: 1px solid var(--border-soft);
-            padding: 8px 12px 6px;
+            padding: 6px 12px 4px;
             z-index: 150;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 60px;
+            min-height: 50px;
             transition: all 0.3s ease;
         }
 
         .ad-banner-bottom.hidden {
-            transform: translateY(100%);
+            transform: translateY(150%);
             opacity: 0;
             pointer-events: none;
         }
@@ -975,41 +1003,74 @@
             border: 1px solid var(--border-soft);
         }
 
-        #container-272c44df2e38e34bc16b9f80978efab2 {
+        /* In-page ad — صغير، داخل الصفحة، آخر شيء */
+        .ad-inpage {
+            margin: 12px 0 8px;
+            padding: 10px 12px 12px;
+            background: var(--card);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            position: relative;
+            overflow: hidden;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .ad-inpage.hidden {
+            display: none;
+        }
+
+        .ad-inpage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            padding: 0 2px;
+        }
+
+        .ad-inpage-label {
+            font-size: 9px;
+            color: var(--text3);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: var(--bg2);
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .ad-inpage-close {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            transition: 0.15s;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .ad-inpage-close:hover {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+        }
+
+        #container-272c44df2e38e34bc16b9f80978efab2,
+        #container-272c44df2e38e34bc16b9f80978efab2-inline {
             width: 100%;
             max-width: 100%;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 40px;
-        }
-
-        /* Ad in gallery — إعلان بين الصور (اختياري) */
-        .ad-inline {
-            grid-column: 1 / -1;
-            background: var(--card2);
-            border-radius: var(--radius-lg);
-            padding: 12px;
-            border: 1px dashed var(--border);
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .ad-inline .ad-label-inline {
-            position: absolute;
-            top: 6px;
-            right: 10px;
-            font-size: 9px;
-            color: var(--text3);
-            font-weight: 700;
-            background: var(--bg2);
-            padding: 2px 6px;
-            border-radius: 6px;
+            min-height: 50px;
         }
 
         /* Bottom Navigation */
@@ -1018,14 +1079,15 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--card);
+            background: rgba(19, 27, 46, 0.95);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-top: 1px solid var(--border-soft);
             display: flex;
             justify-content: space-around;
             align-items: center;
             padding: 8px 0 10px;
             z-index: 200;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
         }
 
         .nav-item {
@@ -1047,11 +1109,10 @@
 
         .nav-item .nav-label { font-size: 10px; font-weight: 700; }
 
-        .nav-item.active { color: var(--primary-light); }
+        .nav-item.active { color: var(--accent-light); }
 
         .nav-item.active .nav-icon { transform: scale(1.15); }
 
-        /* Center FAB */
         .nav-fab {
             width: 58px; height: 58px;
             border-radius: 50%;
@@ -1063,14 +1124,13 @@
             font-size: 26px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.55);
             margin-top: -22px;
             transition: 0.2s;
+            animation: glowShiftSlow 5s linear infinite;
         }
 
         .nav-fab:active { transform: scale(0.92); }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 150px;
@@ -1104,7 +1164,7 @@
             right: 0;
             width: 4px;
             border-radius: 4px 0 0 4px;
-            background: var(--primary);
+            background: var(--accent);
         }
 
         .toast.success::before { background: var(--success); }
@@ -1122,10 +1182,10 @@
             flex-shrink: 0;
         }
 
-        .toast.success .toast-icon { background: rgba(52, 211, 153, 0.15); color: var(--success); }
-        .toast.error .toast-icon { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
-        .toast.warning .toast-icon { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
-        .toast.info .toast-icon { background: rgba(139, 92, 246, 0.15); color: var(--primary-light); }
+        .toast.success .toast-icon { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .toast.error .toast-icon { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .toast.warning .toast-icon { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .toast.info .toast-icon { background: rgba(59, 130, 246, 0.15); color: var(--accent-light); }
 
         .toast .toast-body { flex: 1; text-align: right; }
 
@@ -1145,12 +1205,12 @@
 
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* Modal */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 13, 26, 0.85);
+            background: rgba(10, 14, 31, 0.85);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -1169,7 +1229,6 @@
             max-height: 90vh;
             overflow-y: auto;
             animation: modalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: var(--shadow-xl);
             border: 1px solid var(--border);
         }
 
@@ -1215,7 +1274,7 @@
             font-size: 42px;
             font-weight: 800;
             margin: 0 auto 16px;
-            box-shadow: 0 16px 40px rgba(139, 92, 246, 0.5);
+            animation: glowShiftSlow 6s linear infinite;
         }
 
         .profile-section {
@@ -1256,9 +1315,9 @@
 
         .profile-input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 12px 16px;
             border: 1.5px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-pill);
             font-size: 14px;
             margin-bottom: 10px;
             background: var(--card);
@@ -1270,15 +1329,15 @@
 
         .profile-input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+            border-color: var(--border-glow);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
         }
 
         .modal-btn {
             width: 100%;
             padding: 13px;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-pill);
             font-size: 14px;
             font-weight: 800;
             cursor: pointer;
@@ -1296,26 +1355,27 @@
         .modal-btn.primary {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
-            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.35);
         }
 
-        .modal-btn.danger { background: rgba(248, 113, 113, 0.15); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.3); }
+        .modal-btn.danger {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
 
-        /* Responsive */
         @media (max-width: 480px) {
             .stat-info .num { font-size: 20px; }
             .stat-icon { width: 46px; height: 46px; font-size: 20px; }
             .gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .auth-card { padding: 22px 18px 20px; }
             .auth-brand h1 { font-size: 22px; }
-            .ad-banner-bottom { bottom: 70px; min-height: 50px; padding: 4px 8px; }
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg2); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
     </style>
 </head>
 <body>
@@ -1325,7 +1385,7 @@
          ============================================ -->
     <div id="authView">
         <div class="auth-brand">
-            <div class="logo-box">🖼️</div>
+            <div class="logo-box glow-ring-slow">🖼️</div>
             <h1>ImageHub</h1>
             <p>منصتك الذكية لرفع وإدارة الصور</p>
         </div>
@@ -1338,7 +1398,6 @@
 
             <div class="auth-msg" id="authMsg"></div>
 
-            <!-- Login -->
             <div id="loginForm">
                 <div class="form-group">
                     <label>📧 البريد الإلكتروني</label>
@@ -1352,7 +1411,6 @@
                 <div class="auth-link" id="forgotBtn">نسيت كلمة السر؟</div>
             </div>
 
-            <!-- Signup -->
             <div id="signupForm" style="display:none;">
                 <div class="form-group">
                     <label>👤 الاسم الكامل</label>
@@ -1391,10 +1449,9 @@
          ============================================ -->
     <div id="appView">
 
-        <!-- Topbar -->
         <div class="topbar">
             <div class="topbar-left">
-                <div class="brand-icon">🖼️</div>
+                <div class="brand-icon glow-ring">🖼️</div>
                 <div>
                     <h1>ImageHub</h1>
                     <span class="sub" id="greetingText">مرحباً بك</span>
@@ -1406,34 +1463,32 @@
             </div>
         </div>
 
-        <!-- Main -->
         <div class="main">
 
-            <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon purple">🖼️</div>
+                    <div class="stat-icon glow-ring">🖼️</div>
                     <div class="stat-info">
                         <div class="num" id="statImages">0</div>
                         <div class="label">صوري</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon cyan">💾</div>
+                    <div class="stat-icon glow-ring" style="animation-delay: 1s;">💾</div>
                     <div class="stat-info">
                         <div class="num" id="statSize">0</div>
                         <div class="label">الحجم</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon green">📅</div>
+                    <div class="stat-icon glow-ring" style="animation-delay: 2s;">📅</div>
                     <div class="stat-info">
                         <div class="num" id="statToday">0</div>
                         <div class="label">اليوم</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon orange">🔥</div>
+                    <div class="stat-icon glow-ring" style="animation-delay: 3s;">🔥</div>
                     <div class="stat-info">
                         <div class="num" id="statDays">0</div>
                         <div class="label">أيام النشاط</div>
@@ -1441,14 +1496,13 @@
                 </div>
             </div>
 
-            <!-- Tabs -->
             <div class="tabs-row">
                 <button class="tab-pill active" data-view="upload">📤 رفع</button>
                 <button class="tab-pill" data-view="gallery">🖼️ معرضي</button>
                 <button class="tab-pill" data-view="history">🕐 السجل</button>
             </div>
 
-            <!-- Upload Section -->
+            <!-- Upload -->
             <div id="sectionUpload">
                 <div class="card">
                     <div class="card-header">
@@ -1491,9 +1545,20 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ============================================
+                     AD #1 — إعلان داخل صفحة الرفع (صغير)
+                     ============================================ -->
+                <div class="ad-inpage" id="adInPageUpload">
+                    <div class="ad-inpage-header">
+                        <span class="ad-inpage-label">إعلان · Ad</span>
+                        <button class="ad-inpage-close" onclick="closeAd('adInPageUpload','uploadAdClosedAt')">✕</button>
+                    </div>
+                    <div id="container-272c44df2e38e34bc16b9f80978efab2"></div>
+                </div>
             </div>
 
-            <!-- Gallery Section -->
+            <!-- Gallery -->
             <div id="sectionGallery" style="display:none;">
                 <div class="card">
                     <div class="card-header">
@@ -1507,9 +1572,20 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ============================================
+                     AD #2 — إعلان داخل المعرض (آخر شيء)
+                     ============================================ -->
+                <div class="ad-inpage" id="adInPageGallery">
+                    <div class="ad-inpage-header">
+                        <span class="ad-inpage-label">إعلان · Ad</span>
+                        <button class="ad-inpage-close" onclick="closeAd('adInPageGallery','galleryAdClosedAt')">✕</button>
+                    </div>
+                    <div id="container-272c44df2e38e34bc16b9f80978efab2-inline"></div>
+                </div>
             </div>
 
-            <!-- History Section -->
+            <!-- History -->
             <div id="sectionHistory" style="display:none;">
                 <div class="card">
                     <div class="card-header">
@@ -1523,17 +1599,28 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ============================================
+                     AD #3 — إعلان داخل السجل (آخر شيء)
+                     ============================================ -->
+                <div class="ad-inpage" id="adInPageHistory">
+                    <div class="ad-inpage-header">
+                        <span class="ad-inpage-label">إعلان · Ad</span>
+                        <button class="ad-inpage-close" onclick="closeAd('adInPageHistory','historyAdClosedAt')">✕</button>
+                    </div>
+                    <div id="container-272c44df2e38e34bc16b9f80978efab2-history"></div>
+                </div>
             </div>
 
         </div>
 
         <!-- ============================================
-             AD BANNER — إعلان أسفل الشاشة (غير مزعج)
+             AD — الإعلان القديم (ثابت أسفل الشاشة)
              ============================================ -->
         <div class="ad-banner-bottom" id="adBannerBottom">
-            <button class="ad-close" id="adCloseBtn" title="إغلاق الإعلان">✕</button>
-            <span class="ad-label">إعلان</span>
-            <div id="container-272c44df2e38e34bc16b9f80978efab2"></div>
+            <button class="ad-close" id="adCloseBtn" title="إغلاق">✕</button>
+            <span class="ad-label">إعلان · Ad</span>
+            <div id="container-272c44df2e38e34bc16b9f80978efab2-fixed"></div>
         </div>
 
         <!-- Bottom Navigation -->
@@ -1608,7 +1695,6 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast">
         <div class="toast-icon" id="toastIcon">ℹ️</div>
         <div class="toast-body">
@@ -1617,12 +1703,12 @@
         </div>
     </div>
 
-    <!-- سكريبت الإعلانات -->
+    <!-- سكريبت الإعلانات (الآمن فقط — بدون redirect) -->
     <script async="async" data-cfasync="false" src="https://pl29581573.profitableratecpmnetwork.com/272c44df2e38e34bc16b9f80978efab2/invoke.js"></script>
 
     <script>
         // ============================================
-        // 1. Firebase Config
+        // 1. Firebase
         // ============================================
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyBHnknMBiVdigipFyLMNkdFcm_tOQKWc-4",
@@ -1638,15 +1724,9 @@
         const AUTH = firebase.auth();
         const DB = firebase.database();
 
-        // ============================================
-        // 2. ImgBB
-        // ============================================
         const IMGBB_API_KEY = '7487da0f22c0199e298bbcd4c44bf174';
         const IMGBB_URL = 'https://api.imgbb.com/1/upload';
 
-        // ============================================
-        // 3. Elements
-        // ============================================
         const $ = id => document.getElementById(id);
         const authView = $('authView');
         const appView = $('appView');
@@ -1660,31 +1740,56 @@
         let userImages = [];
 
         // ============================================
-        // 4. Ad Management — إدارة الإعلان
+        // 2. Ad Management
         // ============================================
-        const AD_CLOSE_KEY = 'adBannerClosedAt';
-        const AD_CLOSE_DURATION = 2 * 60 * 60 * 1000; // ساعتان
+        const AD_DURATION = 2 * 60 * 60 * 1000; // ساعتان
 
-        function initAdBanner() {
-            const adBanner = $('adBannerBottom');
-            const adCloseBtn = $('adCloseBtn');
+        function closeAd(elementId, storageKey) {
+            const el = $(elementId);
+            if (!el) return;
+            el.classList.add('hidden');
+            localStorage.setItem(storageKey, Date.now().toString());
+            showToast('تم إخفاء الإعلان مؤقتاً', 'info', 'إعلان');
+        }
 
-            if (!adBanner) return;
-
-            const closedAt = localStorage.getItem(AD_CLOSE_KEY);
-            if (closedAt && (Date.now() - parseInt(closedAt)) < AD_CLOSE_DURATION) {
-                adBanner.classList.add('hidden');
+        function restoreAds() {
+            // الإعلان القديم (fixed)
+            const fixedAd = $('adBannerBottom');
+            const fixedClosed = localStorage.getItem('fixedAdClosedAt');
+            if (fixedAd && fixedClosed && (Date.now() - parseInt(fixedClosed)) < AD_DURATION) {
+                fixedAd.classList.add('hidden');
             }
 
-            adCloseBtn.addEventListener('click', () => {
-                adBanner.classList.add('hidden');
-                localStorage.setItem(AD_CLOSE_KEY, Date.now().toString());
-                showToast('تم إخفاء الإعلان مؤقتاً', 'info', 'إعلان');
+            // الإعلانات داخل الصفحة
+            const ads = [
+                { id: 'adInPageUpload', key: 'uploadAdClosedAt' },
+                { id: 'adInPageGallery', key: 'galleryAdClosedAt' },
+                { id: 'adInPageHistory', key: 'historyAdClosedAt' }
+            ];
+            ads.forEach(({ id, key }) => {
+                const el = $(id);
+                const closed = localStorage.getItem(key);
+                if (el && closed && (Date.now() - parseInt(closed)) < AD_DURATION) {
+                    el.classList.add('hidden');
+                }
             });
         }
 
+        function initAds() {
+            restoreAds();
+
+            const fixedClose = $('adCloseBtn');
+            if (fixedClose) {
+                fixedClose.addEventListener('click', () => {
+                    $('adBannerBottom').classList.add('hidden');
+                    localStorage.setItem('fixedAdClosedAt', Date.now().toString());
+                    showToast('تم إخفاء الإعلان مؤقتاً', 'info', 'إعلان');
+                });
+            }
+        }
+
         // ============================================
-        // 5. Toast
+        // 3. Toast
         // ============================================
         function showToast(text, type = 'info', title = null) {
             const t = $('toast');
@@ -1692,19 +1797,8 @@
             const titleEl = $('toastTitle');
             const textEl = $('toastText');
 
-            const icons = {
-                success: '✅',
-                error: '❌',
-                warning: '⚠️',
-                info: 'ℹ️'
-            };
-
-            const titles = {
-                success: 'تم بنجاح',
-                error: 'خطأ',
-                warning: 'تنبيه',
-                info: 'إشعار'
-            };
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            const titles = { success: 'تم بنجاح', error: 'خطأ', warning: 'تنبيه', info: 'إشعار' };
 
             icon.textContent = icons[type] || 'ℹ️';
             titleEl.textContent = title || titles[type] || 'إشعار';
@@ -1727,7 +1821,7 @@
         function setAuthLoading(state) { authLoader.classList.toggle('show', state); }
 
         // ============================================
-        // 6. Helpers
+        // 4. Helpers
         // ============================================
         function formatSize(bytes) {
             if (!bytes) return '0 B';
@@ -1743,14 +1837,6 @@
             const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
             return `${days[d.getDay()]}، ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-        }
-
-        function formatTime(ts) {
-            if (!ts) return '—';
-            const d = new Date(ts);
-            const h = String(d.getHours()).padStart(2, '0');
-            const m = String(d.getMinutes()).padStart(2, '0');
-            return `${h}:${m}`;
         }
 
         function timeAgo(ts) {
@@ -1803,7 +1889,7 @@
         }
 
         // ============================================
-        // 7. Tabs
+        // 5. Tabs Auth
         // ============================================
         $('tabLogin').addEventListener('click', () => {
             $('tabLogin').classList.add('active');
@@ -1819,14 +1905,12 @@
         });
 
         // ============================================
-        // 8. Login
+        // 6. Login / Signup / Forgot / Google
         // ============================================
         $('loginBtn').addEventListener('click', async () => {
             const email = $('loginEmail').value.trim();
             const password = $('loginPassword').value;
-
             if (!email || !password) { showAuthMsg('⚠️ أدخل البريد وكلمة السر'); return; }
-
             setAuthLoading(true);
             try {
                 await AUTH.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
@@ -1843,30 +1927,21 @@
             } finally { setAuthLoading(false); }
         });
 
-        // ============================================
-        // 9. Signup
-        // ============================================
         $('signupBtn').addEventListener('click', async () => {
             const name = $('signupName').value.trim();
             const email = $('signupEmail').value.trim();
             const password = $('signupPassword').value;
             const confirm = $('signupPasswordConfirm').value;
-
             if (!name) { showAuthMsg('⚠️ أدخل الاسم'); return; }
             if (!email || !password || !confirm) { showAuthMsg('⚠️ املأ جميع الحقول'); return; }
             if (password.length < 6) { showAuthMsg('⚠️ كلمة السر 6 أحرف على الأقل'); return; }
             if (password !== confirm) { showAuthMsg('⚠️ كلمتا السر غير متطابقتين'); return; }
-
             setAuthLoading(true);
             try {
                 const cred = await AUTH.createUserWithEmailAndPassword(email, password);
                 if (cred.user) {
                     await DB.ref('users/' + cred.user.uid + '/profile').set({
-                        uid: cred.user.uid,
-                        email: email,
-                        name: name,
-                        createdAt: Date.now(),
-                        provider: 'email'
+                        uid: cred.user.uid, email, name, createdAt: Date.now(), provider: 'email'
                     });
                 }
                 showAuthMsg('✅ تم إنشاء الحساب بنجاح', 'success');
@@ -1879,9 +1954,6 @@
             } finally { setAuthLoading(false); }
         });
 
-        // ============================================
-        // 10. Forgot password
-        // ============================================
         $('forgotBtn').addEventListener('click', async () => {
             const email = $('loginEmail').value.trim();
             if (!email) { showAuthMsg('⚠️ اكتب بريدك أولاً'); return; }
@@ -1891,16 +1963,12 @@
             } catch (err) { showAuthMsg('❌ تعذر الإرسال'); }
         });
 
-        // ============================================
-        // 11. Google login
-        // ============================================
         $('googleBtn').addEventListener('click', async () => {
             setAuthLoading(true);
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 provider.setCustomParameters({ prompt: 'select_account' });
                 const result = await AUTH.signInWithPopup(provider);
-
                 if (result.user) {
                     const snap = await DB.ref('users/' + result.user.uid + '/profile').once('value');
                     if (!snap.exists()) {
@@ -1920,7 +1988,7 @@
         });
 
         // ============================================
-        // 12. Auth state
+        // 7. Auth state
         // ============================================
         AUTH.onAuthStateChanged(user => {
             if (user) {
@@ -1942,13 +2010,12 @@
         });
 
         // ============================================
-        // 13. Profile
+        // 8. Profile
         // ============================================
         async function loadProfile() {
             if (!currentUser) return;
             const snap = await DB.ref('users/' + currentUser.uid + '/profile').once('value');
             currentProfile = snap.val() || {};
-
             const name = currentProfile.name || (currentUser.email ? currentUser.email.split('@')[0] : 'مستخدم');
             const initial = getInitial(name);
 
@@ -1963,11 +2030,10 @@
         }
 
         // ============================================
-        // 14. Load images
+        // 9. Load images
         // ============================================
         function loadUserImages() {
             if (!currentUser) return;
-
             DB.ref('users/' + currentUser.uid + '/images').on('value', snapshot => {
                 const data = snapshot.val() || {};
                 userImages = Object.keys(data).map(k => ({ id: k, ...data[k] }))
@@ -1982,25 +2048,19 @@
         }
 
         // ============================================
-        // 15. Gallery
+        // 10. Gallery
         // ============================================
         function renderGallery() {
             const gallery = $('gallery');
-
             if (userImages.length === 0) {
-                gallery.innerHTML = `<div class="empty">
-                    <span class="big">📭</span>
-                    <p>لا توجد صور بعد</p>
-                </div>`;
+                gallery.innerHTML = `<div class="empty"><span class="big">📭</span><p>لا توجد صور بعد</p></div>`;
                 $('galleryCount').textContent = '0';
                 return;
             }
-
             gallery.innerHTML = userImages.map((img, i) => `
                 <div class="gallery-item" onclick="openImage('${img.url}')">
-                    ${i === 0 ? '<div class="ribbon">جديد</div>' : ''}
-                    <img src="${img.thumb || img.url}" alt="${escapeHtml(img.name || '')}" loading="lazy"
-                         onerror="this.src='${img.url}'">
+                    ${i === 0 ? '<div class="ribbon">جديد · New</div>' : ''}
+                    <img src="${img.thumb || img.url}" alt="${escapeHtml(img.name || '')}" loading="lazy" onerror="this.src='${img.url}'">
                     <div class="overlay">
                         <div class="name">${escapeHtml(img.name || 'صورة')}</div>
                         <div class="size">${formatSize(img.size || 0)}</div>
@@ -2012,13 +2072,11 @@
                     </div>
                 </div>
             `).join('');
-
             $('galleryCount').textContent = userImages.length;
         }
 
         window.openImage = url => window.open(url, '_blank');
         window.copyImageUrl = url => copyToClipboard(url, 'تم نسخ الرابط');
-
         window.deleteImage = async id => {
             if (!currentUser) return;
             if (!confirm('تأكيد حذف هذه الصورة من سجلك؟')) return;
@@ -2032,20 +2090,15 @@
         };
 
         // ============================================
-        // 16. History
+        // 11. History
         // ============================================
         function renderHistory() {
             const list = $('historyList');
-
             if (userImages.length === 0) {
-                list.innerHTML = `<div class="empty">
-                    <span class="big">📭</span>
-                    <p>لا يوجد سجل بعد</p>
-                </div>`;
+                list.innerHTML = `<div class="empty"><span class="big">📭</span><p>لا يوجد سجل بعد</p></div>`;
                 $('historyCount').textContent = '0';
                 return;
             }
-
             list.innerHTML = userImages.slice(0, 20).map(img => `
                 <div class="history-row" onclick="openImage('${img.url}')">
                     <div class="h-icon">🖼️</div>
@@ -2059,12 +2112,11 @@
                     <div class="h-status">ناجح</div>
                 </div>
             `).join('');
-
             $('historyCount').textContent = userImages.length;
         }
 
         // ============================================
-        // 17. Stats
+        // 12. Stats
         // ============================================
         function updateStats() {
             const total = userImages.length;
@@ -2083,7 +2135,7 @@
         }
 
         // ============================================
-        // 18. File selection
+        // 13. File selection
         // ============================================
         const dropZone = $('dropZone');
         const fileInput = $('fileInput');
@@ -2114,15 +2166,8 @@
         });
 
         function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showToast('الرجاء اختيار ملف صورة', 'error');
-                return;
-            }
-            if (file.size > 32 * 1024 * 1024) {
-                showToast('حجم الصورة يتجاوز 32 ميجابايت', 'error');
-                return;
-            }
-
+            if (!file.type.startsWith('image/')) { showToast('الرجاء اختيار ملف صورة', 'error'); return; }
+            if (file.size > 32 * 1024 * 1024) { showToast('حجم الصورة يتجاوز 32 ميجابايت', 'error'); return; }
             selectedFile = file;
             const reader = new FileReader();
             reader.onload = e => {
@@ -2147,58 +2192,37 @@
         });
 
         // ============================================
-        // 19. Upload
+        // 14. Upload
         // ============================================
         uploadBtn.addEventListener('click', async () => {
             if (!currentUser || !selectedFile) return;
-
             loader.classList.add('show');
             uploadBtn.disabled = true;
             result.classList.remove('show');
-
             try {
                 const formData = new FormData();
                 formData.append('image', selectedFile);
-
-                const res = await fetch(`${IMGBB_URL}?key=${IMGBB_API_KEY}`, {
-                    method: 'POST',
-                    body: formData
-                });
+                const res = await fetch(`${IMGBB_URL}?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
                 const data = await res.json();
-
-                if (!data.success || !data.data?.url) {
-                    throw new Error(data.error?.message || 'فشل الرفع');
-                }
-
+                if (!data.success || !data.data?.url) throw new Error(data.error?.message || 'فشل الرفع');
                 uploadedUrl = data.data.url;
-
                 const imageId = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
                 const imageData = {
-                    id: imageId,
-                    url: uploadedUrl,
+                    id: imageId, url: uploadedUrl,
                     thumb: data.data.thumb?.url || uploadedUrl,
-                    name: selectedFile.name,
-                    size: selectedFile.size,
-                    type: selectedFile.type,
-                    uploadedAt: Date.now(),
-                    width: data.data.width || 0,
-                    height: data.data.height || 0
+                    name: selectedFile.name, size: selectedFile.size, type: selectedFile.type,
+                    uploadedAt: Date.now(), width: data.data.width || 0, height: data.data.height || 0
                 };
-
                 await DB.ref('users/' + currentUser.uid + '/images/' + imageId).set(imageData);
-
                 resultUrl.textContent = uploadedUrl;
                 resultTitle.textContent = '✅ تم الرفع والحفظ في حسابك!';
                 result.className = 'result show';
-
                 showToast('تم رفع الصورة وحفظها في حسابك', 'success', 'رفع ناجح');
-
                 selectedFile = null;
                 fileInput.value = '';
                 preview.classList.remove('show');
                 infoRow.style.display = 'none';
                 uploadBtn.disabled = true;
-
             } catch (err) {
                 console.error(err);
                 resultTitle.textContent = '❌ فشل: ' + (err.message || 'حاول مجدداً');
@@ -2211,16 +2235,8 @@
             }
         });
 
-        // ============================================
-        // 20. Copy / Open / IMG
-        // ============================================
-        window.copyUrl = () => {
-            if (!uploadedUrl) return;
-            copyToClipboard(uploadedUrl, 'تم نسخ الرابط');
-        };
-        window.openUrl = () => {
-            if (uploadedUrl) window.open(uploadedUrl, '_blank');
-        };
+        window.copyUrl = () => { if (uploadedUrl) copyToClipboard(uploadedUrl, 'تم نسخ الرابط'); };
+        window.openUrl = () => { if (uploadedUrl) window.open(uploadedUrl, '_blank'); };
         window.copyImgTag = () => {
             if (!uploadedUrl) return;
             const tag = `<img src="${uploadedUrl}" alt="صورة" style="max-width:100%;height:auto;border-radius:12px;">`;
@@ -2228,25 +2244,19 @@
         };
 
         // ============================================
-        // 21. Tabs switching
+        // 15. Tabs switching
         // ============================================
         function switchView(view) {
             document.querySelectorAll('.tab-pill').forEach(b => b.classList.toggle('active', b.dataset.view === view));
             document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-
             $('sectionUpload').style.display = view === 'upload' ? 'block' : 'none';
             $('sectionGallery').style.display = view === 'gallery' ? 'block' : 'none';
             $('sectionHistory').style.display = view === 'history' ? 'block' : 'none';
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        document.querySelectorAll('.tab-pill').forEach(btn => {
-            btn.addEventListener('click', () => switchView(btn.dataset.view));
-        });
-        document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
-            btn.addEventListener('click', () => switchView(btn.dataset.view));
-        });
+        document.querySelectorAll('.tab-pill').forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.view)));
+        document.querySelectorAll('.nav-item[data-view]').forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.view)));
         $('navFab').addEventListener('click', () => switchView('upload'));
         $('navProfile').addEventListener('click', () => {
             $('profileModal').classList.add('show');
@@ -2256,7 +2266,7 @@
         });
 
         // ============================================
-        // 22. Profile modal
+        // 16. Profile modal
         // ============================================
         $('profileBtn').addEventListener('click', () => {
             $('profileModal').classList.add('show');
@@ -2273,7 +2283,6 @@
             const newName = $('editNameInput').value.trim();
             if (!newName) { showToast('أدخل الاسم', 'error'); return; }
             if (newName.length > 30) { showToast('الاسم طويل جداً', 'error'); return; }
-
             try {
                 await DB.ref('users/' + currentUser.uid + '/profile/name').set(newName);
                 currentProfile.name = newName;
@@ -2293,11 +2302,9 @@
             const cur = $('currentPassInput').value;
             const np = $('newPassInput').value;
             const npc = $('newPassConfirmInput').value;
-
             if (!cur || !np || !npc) { showToast('املأ جميع الحقول', 'error'); return; }
             if (np.length < 6) { showToast('كلمة السر 6 أحرف على الأقل', 'error'); return; }
             if (np !== npc) { showToast('كلمتا السر غير متطابقتين', 'error'); return; }
-
             try {
                 const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, cur);
                 await currentUser.reauthenticateWithCredential(cred);
@@ -2329,7 +2336,6 @@
             }
         });
 
-        // Enter shortcuts
         ['loginEmail', 'loginPassword'].forEach(id => {
             $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
         });
@@ -2338,11 +2344,11 @@
         });
 
         // ============================================
-        // 23. Init
+        // 17. Init
         // ============================================
-        initAdBanner();
+        initAds();
 
-        console.log('🚀 ImageHub Ready — Dark Mode with Ads');
+        console.log('🚀 ImageHub Ready — Dark Blue Theme with Multi Ads');
     </script>
 </body>
 </html>
