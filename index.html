@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ImageHub — منصة رفع الصور الذكية</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        :root {
+            /* لوحة الألوان الجديدة — بنفسجي + تركواز */
+            --primary: #7c3aed;
+            --primary-dark: #5b21b6;
+            --primary-light: #a78bfa;
+            --accent: #06b6d4;
+            --accent-dark: #0891b2;
+            --accent-light: #67e8f9;
+
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+
+            --bg: #f8f7ff;
+            --card: #ffffff;
+            --text: #1e1b4b;
+            --text2: #6b7280;
+            --text3: #9ca3af;
+            --border: #e5e7eb;
+            --border-soft: #f3f4f6;
+
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 28px;
+
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 16px rgba(124, 58, 237, 0.08);
+            --shadow-lg: 0 12px 32px rgba(124, 58, 237, 0.15);
+            --shadow-xl: 0 24px 60px rgba(124, 58, 237, 0.2);
+        }
+
+        html, body { height: 100%; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            direction: rtl;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* خلفية بألوان شعاعية ناعمة */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 12% 8%, rgba(124, 58, 237, 0.12) 0%, transparent 42%),
+                radial-gradient(circle at 88% 12%, rgba(6, 182, 212, 0.12) 0%, transparent 42%),
+                radial-gradient(circle at 50% 95%, rgba(167, 139, 250, 0.10) 0%, transparent 45%),
+                radial-gradient(circle at 95% 75%, rgba(103, 232, 249, 0.10) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* ============================================
+           Auth View
+           ============================================ */
+        #authView {
+            max-width: 440px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 16px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-brand {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-brand .logo-box {
+            width: 84px; height: 84px;
+            margin: 0 auto 16px;
+            border-radius: 26px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 20px 48px rgba(124, 58, 237, 0.35);
+            animation: floatIcon 3.5s ease-in-out infinite;
+            color: #fff;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .auth-brand h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+
+        .auth-brand p {
+            font-size: 13px;
+            color: var(--text2);
+            margin-top: 6px;
+        }
+
+        .auth-card {
+            background: var(--card);
+            border-radius: var(--radius-xl);
+            padding: 28px 22px 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-soft);
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 4px;
+            margin-bottom: 22px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 11px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 12px;
+            color: var(--text2);
+            transition: 0.25s;
+            user-select: none;
+        }
+
+        .auth-tab.active {
+            background: var(--card);
+            color: var(--primary);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+            padding-right: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            transition: 0.2s;
+            background: var(--card);
+            font-family: inherit;
+            color: var(--text);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+        }
+
+        .form-group input[dir="ltr"] { direction: ltr; text-align: left; }
+
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .auth-btn:active { transform: scale(0.97); }
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .auth-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(124, 58, 237, 0.35);
+        }
+
+        .auth-btn.google {
+            background: var(--card);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+
+        .auth-msg {
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .auth-msg.show { display: block; }
+        .auth-msg.error { background: #fef2f2; color: var(--danger); }
+        .auth-msg.success { background: #ecfdf5; color: var(--success); }
+
+        .auth-loader { display: none; text-align: center; padding: 10px; }
+        .auth-loader.show { display: block; }
+
+        .spin {
+            width: 28px; height: 28px;
+            border: 3px solid var(--border-soft);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .auth-divider {
+            text-align: center;
+            margin: 16px 0;
+            font-size: 12px;
+            color: var(--text3);
+            position: relative;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .auth-divider::before { right: 0; }
+        .auth-divider::after { left: 0; }
+
+        .auth-link {
+            text-align: center;
+            font-size: 13px;
+            color: var(--primary);
+            cursor: pointer;
+            margin-top: 8px;
+            font-weight: 700;
+        }
+
+        .auth-link:hover { text-decoration: underline; }
+
+        .footer-note {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text3);
+            margin-top: 18px;
+        }
+
+        /* ============================================
+           App View (Dashboard)
+           ============================================ */
+        #appView { display: none; min-height: 100vh; flex-direction: column; }
+
+        /* Topbar */
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border-soft);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+        .topbar-left .brand-icon {
+            width: 46px; height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.28);
+            flex-shrink: 0;
+        }
+
+        .topbar-left h1 {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .topbar-left .sub {
+            font-size: 11px;
+            color: var(--text2);
+            font-weight: 600;
+            display: block;
+            margin-top: 1px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
+        }
+
+        .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+        .icon-btn {
+            width: 42px; height: 42px;
+            border-radius: 14px;
+            background: var(--border-soft);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.15s;
+            color: var(--text);
+        }
+
+        .icon-btn:active { transform: scale(0.92); }
+        .icon-btn:hover { background: #e5e7eb; }
+
+        .avatar-btn {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
+        }
+
+        .avatar-btn:active { transform: scale(0.92); }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 16px 14px 100px;
+        }
+
+        /* Stats grid — مثل الصورة: بطاقات بيضاء بحواف دائرية */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 18px 16px;
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
+        }
+
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+        .stat-icon {
+            width: 52px; height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.purple { background: rgba(124, 58, 237, 0.12); color: var(--primary); }
+        .stat-icon.cyan { background: rgba(6, 182, 212, 0.12); color: var(--accent); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+
+        .stat-info { min-width: 0; }
+
+        .stat-info .num {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .stat-info .label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text2);
+            margin-top: 3px;
+        }
+
+        /* Tabs — مثل الصورة (شرائط) */
+        .tabs-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .tabs-row::-webkit-scrollbar { display: none; }
+
+        .tab-pill {
+            padding: 10px 18px;
+            border-radius: 40px;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text2);
+            white-space: nowrap;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-pill.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
+        }
+
+        .tab-pill:active { transform: scale(0.96); }
+
+        /* Card */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 10px;
+        }
+
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 40px;
+            font-weight: 800;
+        }
+
+        .badge.success { background: var(--success); }
+        .badge.warning { background: var(--warning); }
+        .badge.danger { background: var(--danger); }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--primary-light);
+            border-radius: var(--radius-lg);
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.25s;
+            background: rgba(124, 58, 237, 0.03);
+            margin-bottom: 14px;
+        }
+
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.07);
+            transform: scale(1.01);
+        }
+
+        .drop-zone .icon { font-size: 52px; margin-bottom: 10px; display: block; }
+        .drop-zone .text { font-size: 15px; color: var(--text); font-weight: 700; }
+        .drop-zone .hint { font-size: 12px; color: var(--text2); margin-top: 6px; }
+
+        /* Preview */
+        .preview {
+            display: none;
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 14px;
+            background: var(--border-soft);
+        }
+
+        .preview.show { display: block; }
+
+        .preview img {
+            width: 100%;
+            max-height: 320px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .preview .remove-btn {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.95);
+            color: #fff;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .preview .remove-btn:active { transform: scale(0.9); }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--border-soft);
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            color: var(--text);
+            font-weight: 700;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.15s;
+            margin-bottom: 10px;
+        }
+
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(124, 58, 237, 0.32);
+        }
+
+        .btn-outline {
+            background: var(--card);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 16px;
+        }
+
+        .loader.show { display: block; }
+
+        .loader .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(124, 58, 237, 0.15);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        .loader .txt { font-size: 13px; color: var(--text2); font-weight: 700; }
+
+        /* Result */
+        .result {
+            display: none;
+            padding: 18px;
+            border-radius: var(--radius-lg);
+            background: #ecfdf5;
+            border: 1.5px solid rgba(16, 185, 129, 0.3);
+            margin-top: 12px;
+        }
+
+        .result.show { display: block; animation: msgIn 0.35s ease; }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result.error {
+            background: #fef2f2;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .result .title {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--success);
+        }
+
+        .result.error .title { color: var(--danger); }
+
+        .result .url-box {
+            background: #fff;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 12px;
+            word-break: break-all;
+            direction: ltr;
+            text-align: left;
+            border: 1px solid var(--border);
+            margin-bottom: 10px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .result .actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 420px) {
+            .result .actions { grid-template-columns: 1fr; }
+        }
+
+        .result .actions button {
+            padding: 12px 8px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: 0.15s;
+        }
+
+        .result .actions button:active { transform: scale(0.95); }
+
+        .btn-copy { background: var(--primary); color: #fff; }
+        .btn-open { background: var(--success); color: #fff; }
+        .btn-img { background: var(--warning); color: #fff; }
+
+        /* Gallery — بطاقات شبكية */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        @media (max-width: 380px) {
+            .gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--border-soft);
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-item .ribbon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 40px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+        }
+
+        .gallery-item .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 45%, rgba(30, 27, 75, 0.85) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 10px;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .gallery-item:hover .overlay { opacity: 1; }
+
+        .gallery-item .name {
+            font-size: 11px;
+            color: #fff;
+            font-weight: 800;
+            margin-bottom: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .gallery-item .size {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .gallery-item .actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .gallery-item .actions button {
+            flex: 1;
+            padding: 6px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--text);
+        }
+
+        .gallery-item .actions .del {
+            background: rgba(239, 68, 68, 0.95);
+            color: #fff;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text2);
+            grid-column: 1 / -1;
+        }
+
+        .empty .big { font-size: 60px; display: block; margin-bottom: 12px; opacity: 0.5; }
+        .empty p { font-size: 14px; }
+
+        /* History rows — مثل بطاقات الصورة */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .history-row {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            border: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
+        }
+
+        .history-row:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+        .history-row .h-icon {
+            width: 46px; height: 46px;
+            border-radius: 14px;
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .history-row .h-info { flex: 1; min-width: 0; }
+
+        .history-row .h-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-row .h-meta {
+            font-size: 11px;
+            color: var(--text2);
+            font-weight: 600;
+            margin-top: 3px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .history-row .h-status {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 40px;
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+            flex-shrink: 0;
+        }
+
+        /* Bottom Navigation — مثل الصورة */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border-soft);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0 10px;
+            z-index: 200;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            padding: 6px 0;
+            font-family: inherit;
+            color: var(--text3);
+            transition: 0.2s;
+        }
+
+        .nav-item .nav-icon { font-size: 22px; }
+
+        .nav-item .nav-label { font-size: 10px; font-weight: 700; }
+
+        .nav-item.active { color: var(--primary); }
+
+        .nav-item.active .nav-icon { transform: scale(1.15); }
+
+        /* Center FAB — زر الرفع */
+        .nav-fab {
+            width: 58px; height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 28px rgba(124, 58, 237, 0.45);
+            margin-top: -22px;
+            transition: 0.2s;
+        }
+
+        .nav-fab:active { transform: scale(0.92); }
+
+        /* Toast — بطاقة بيضاء مع خط جانبي مثل الإشعار في الصورة */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--card);
+            color: var(--text);
+            padding: 14px 18px 14px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            max-width: 92%;
+            min-width: 280px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            direction: rtl;
+        }
+
+        .toast::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            bottom: 12px;
+            right: 0;
+            width: 4px;
+            border-radius: 4px 0 0 4px;
+            background: var(--primary);
+        }
+
+        .toast.success::before { background: var(--success); }
+        .toast.error::before { background: var(--danger); }
+        .toast.warning::before { background: var(--warning); }
+
+        .toast .toast-icon {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+        .toast.error .toast-icon { background: rgba(239, 68, 68, 0.12); color: var(--danger); }
+        .toast.warning .toast-icon { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+        .toast.info .toast-icon { background: rgba(124, 58, 237, 0.12); color: var(--primary); }
+
+        .toast .toast-body { flex: 1; text-align: right; }
+
+        .toast .toast-title {
+            font-size: 11px;
+            color: var(--text3);
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .toast .toast-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(30, 27, 75, 0.5);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 8000;
+            padding: 16px;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--card);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 460px;
+            padding: 24px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: var(--shadow-xl);
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .modal-header h2 { font-size: 19px; font-weight: 800; }
+
+        .modal-close {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--border-soft);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .modal-close:active { transform: scale(0.92); }
+
+        .avatar-big {
+            width: 96px; height: 96px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 42px;
+            font-weight: 800;
+            margin: 0 auto 16px;
+            box-shadow: 0 16px 40px rgba(124, 58, 237, 0.35);
+        }
+
+        .profile-section {
+            background: var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .profile-section h3 {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13px;
+            gap: 10px;
+        }
+
+        .profile-row .key { color: var(--text2); font-weight: 700; flex-shrink: 0; }
+        .profile-row .val {
+            color: var(--text);
+            font-weight: 800;
+            word-break: break-all;
+            text-align: left;
+            direction: ltr;
+        }
+
+        .profile-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            margin-bottom: 10px;
+            background: var(--card);
+            font-family: inherit;
+            color: var(--text);
+        }
+
+        .profile-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            transition: transform 0.15s;
+        }
+
+        .modal-btn:active { transform: scale(0.97); }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+        }
+
+        .modal-btn.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .stat-info .num { font-size: 20px; }
+            .stat-icon { width: 46px; height: 46px; font-size: 20px; }
+            .gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .auth-card { padding: 22px 18px 20px; }
+            .auth-brand h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         Auth View
+         ============================================ -->
+    <div id="authView">
+        <div class="auth-brand">
+            <div class="logo-box">🖼️</div>
+            <h1>ImageHub</h1>
+            <p>منصتك الذكية لرفع وإدارة الصور</p>
+        </div>
+
+        <div class="auth-card">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tabLogin">دخول</div>
+                <div class="auth-tab" id="tabSignup">حساب جديد</div>
+            </div>
+
+            <div class="auth-msg" id="authMsg"></div>
+
+            <!-- Login -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>📧 البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" dir="ltr">
+                </div>
+                <div class="form-group">
+                    <label>🔒 كلمة السر</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" dir="ltr">
+                </div>
+                <button class="auth-btn primary" id="loginBtn">🚀 تسجيل الدخول</button>
+                <div class="auth-link" id="forgotBtn">نسيت كلمة السر؟</div>
+            </div>
+
+            <!-- Signup -->
+            <div id="signupForm" style="display:none;">
+                <div class="form-group">
+                    <label>👤 الاسم الكامل</label>
+                    <input type="text" id="signupName" placeholder="اسمك">
+                </div>
+                <div class="form-group">
+                    <label>📧 البريد الإلكتروني</label>
+                    <input type="email" id="signupEmail" placeholder="your@email.com" dir="ltr">
+                </div>
+                <div class="form-group">
+                    <label>🔒 كلمة السر</label>
+                    <input type="password" id="signupPassword" placeholder="6 أحرف على الأقل" dir="ltr">
+                </div>
+                <div class="form-group">
+                    <label>🔒 تأكيد كلمة السر</label>
+                    <input type="password" id="signupPasswordConfirm" placeholder="••••••••" dir="ltr">
+                </div>
+                <button class="auth-btn primary" id="signupBtn">✨ إنشاء الحساب</button>
+            </div>
+
+            <div class="auth-divider">أو</div>
+
+            <button class="auth-btn google" id="googleBtn">
+                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.1-11.3-7.6l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.2 5.2C41 35.7 44 30.2 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
+                الدخول باستخدام Google
+            </button>
+
+            <div class="auth-loader" id="authLoader"><div class="spin"></div></div>
+
+            <div class="footer-note">🔒 محمي بواسطة Firebase</div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         App View
+         ============================================ -->
+    <div id="appView">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="brand-icon">🖼️</div>
+                <div>
+                    <h1>ImageHub</h1>
+                    <span class="sub" id="greetingText">مرحباً بك</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-btn" id="refreshBtn">🔄</button>
+                <button class="avatar-btn" id="profileBtn">؟</button>
+            </div>
+        </div>
+
+        <!-- Main -->
+        <div class="main">
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon purple">🖼️</div>
+                    <div class="stat-info">
+                        <div class="num" id="statImages">0</div>
+                        <div class="label">صوري</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon cyan">💾</div>
+                    <div class="stat-info">
+                        <div class="num" id="statSize">0</div>
+                        <div class="label">الحجم</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">📅</div>
+                    <div class="stat-info">
+                        <div class="num" id="statToday">0</div>
+                        <div class="label">اليوم</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">🔥</div>
+                    <div class="stat-info">
+                        <div class="num" id="statDays">0</div>
+                        <div class="label">أيام النشاط</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-row">
+                <button class="tab-pill active" data-view="upload">📤 رفع</button>
+                <button class="tab-pill" data-view="gallery">🖼️ معرضي</button>
+                <button class="tab-pill" data-view="history">🕐 السجل</button>
+            </div>
+
+            <!-- Upload Section -->
+            <div id="sectionUpload">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>➕ رفع صورة جديدة</h3>
+                        <span class="badge">سريع</span>
+                    </div>
+
+                    <div class="drop-zone" id="dropZone">
+                        <span class="icon">📁</span>
+                        <div class="text">اضغط لاختيار صورة أو اسحبها هنا</div>
+                        <div class="hint">JPG • PNG • GIF • WebP — حتى 32 ميجابايت</div>
+                    </div>
+
+                    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+
+                    <div class="preview" id="preview">
+                        <img id="previewImg" src="" alt="preview">
+                        <button class="remove-btn" id="removeBtn">✕</button>
+                    </div>
+
+                    <div class="info-row" id="infoRow" style="display:none;">
+                        <span id="fileName">—</span>
+                        <span id="fileSize">—</span>
+                    </div>
+
+                    <button class="btn btn-primary" id="uploadBtn" disabled>🚀 رفع الصورة</button>
+
+                    <div class="loader" id="loader">
+                        <div class="spinner"></div>
+                        <div class="txt">⏳ جاري الرفع والحفظ...</div>
+                    </div>
+
+                    <div class="result" id="result">
+                        <div class="title" id="resultTitle">✅ تم الرفع بنجاح!</div>
+                        <div class="url-box" id="resultUrl"></div>
+                        <div class="actions">
+                            <button class="btn-copy" onclick="copyUrl()">📋 نسخ</button>
+                            <button class="btn-open" onclick="openUrl()">🔗 فتح</button>
+                            <button class="btn-img" onclick="copyImgTag()">🖼️ IMG</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Section -->
+            <div id="sectionGallery" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🖼️ معرض صوري</h3>
+                        <span class="badge" id="galleryCount">0</span>
+                    </div>
+                    <div class="gallery" id="gallery">
+                        <div class="empty">
+                            <span class="big">📭</span>
+                            <p>لا توجد صور بعد</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div id="sectionHistory" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🕐 سجل الرفع</h3>
+                        <span class="badge warning" id="historyCount">0</span>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <div class="empty">
+                            <span class="big">📭</span>
+                            <p>لا يوجد سجل بعد</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="nav-item active" data-view="upload">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">رفع</span>
+            </button>
+            <button class="nav-item" data-view="gallery">
+                <span class="nav-icon">🖼️</span>
+                <span class="nav-label">معرضي</span>
+            </button>
+            <button class="nav-fab" id="navFab">⚡</button>
+            <button class="nav-item" data-view="history">
+                <span class="nav-icon">🕐</span>
+                <span class="nav-label">السجل</span>
+            </button>
+            <button class="nav-item" id="navProfile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">حسابي</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================
+         Profile Modal
+         ============================================ -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>👤 الملف الشخصي</h2>
+                <button class="modal-close" id="profileCloseBtn">✕</button>
+            </div>
+
+            <div class="avatar-big" id="avatarBig">؟</div>
+
+            <div class="profile-section">
+                <h3>📋 معلومات الحساب</h3>
+                <div class="profile-row">
+                    <span class="key">📧 البريد</span>
+                    <span class="val" id="profileEmail">—</span>
+                </div>
+                <div class="profile-row">
+                    <span class="key">👤 الاسم</span>
+                    <span class="val" id="profileName">—</span>
+                </div>
+                <div class="profile-row">
+                    <span class="key">📅 التسجيل</span>
+                    <span class="val" id="profileCreated">—</span>
+                </div>
+                <div class="profile-row">
+                    <span class="key">🆔 المعرف</span>
+                    <span class="val" id="profileUid" style="font-size:11px;">—</span>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3>✏️ تعديل الاسم</h3>
+                <input type="text" id="editNameInput" class="profile-input" placeholder="الاسم الجديد" maxlength="30">
+                <button class="modal-btn primary" id="saveNameBtn">💾 حفظ الاسم</button>
+            </div>
+
+            <div class="profile-section">
+                <h3>🔒 تغيير كلمة المرور</h3>
+                <input type="password" id="currentPassInput" class="profile-input" placeholder="كلمة السر الحالية">
+                <input type="password" id="newPassInput" class="profile-input" placeholder="كلمة السر الجديدة">
+                <input type="password" id="newPassConfirmInput" class="profile-input" placeholder="تأكيد كلمة السر">
+                <button class="modal-btn primary" id="changePassBtn">🔑 تغيير كلمة المرور</button>
+            </div>
+
+            <button class="modal-btn danger" id="logoutBtnModal">🚪 تسجيل الخروج</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toastIcon">ℹ️</div>
+        <div class="toast-body">
+            <div class="toast-title" id="toastTitle">إشعار</div>
+            <div class="toast-text" id="toastText"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 1. Firebase Config
+        // ============================================
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyBHnknMBiVdigipFyLMNkdFcm_tOQKWc-4",
+            authDomain: "aktubar98.firebaseapp.com",
+            databaseURL: "https://aktubar98-default-rtdb.firebaseio.com",
+            projectId: "aktubar98",
+            storageBucket: "aktubar98.appspot.com",
+            messagingSenderId: "679902534827",
+            appId: "1:679902534827:android:03edb9ea18b42eaef7abee"
+        };
+
+        firebase.initializeApp(FIREBASE_CONFIG);
+        const AUTH = firebase.auth();
+        const DB = firebase.database();
+
+        // ============================================
+        // 2. ImgBB
+        // ============================================
+        const IMGBB_API_KEY = '7487da0f22c0199e298bbcd4c44bf174';
+        const IMGBB_URL = 'https://api.imgbb.com/1/upload';
+
+        // ============================================
+        // 3. Elements
+        // ============================================
+        const $ = id => document.getElementById(id);
+        const authView = $('authView');
+        const appView = $('appView');
+        const authMsg = $('authMsg');
+        const authLoader = $('authLoader');
+
+        let currentUser = null;
+        let currentProfile = null;
+        let selectedFile = null;
+        let uploadedUrl = '';
+        let userImages = [];
+
+        // ============================================
+        // 4. Toast (مثل الإشعار في الصورة)
+        // ============================================
+        function showToast(text, type = 'info', title = null) {
+            const t = $('toast');
+            const icon = $('toastIcon');
+            const titleEl = $('toastTitle');
+            const textEl = $('toastText');
+
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+
+            const titles = {
+                success: 'تم بنجاح',
+                error: 'خطأ',
+                warning: 'تنبيه',
+                info: 'إشعار'
+            };
+
+            icon.textContent = icons[type] || 'ℹ️';
+            titleEl.textContent = title || titles[type] || 'إشعار';
+            textEl.textContent = text;
+
+            t.className = 'toast ' + type;
+            void t.offsetWidth;
+            t.classList.add('show');
+
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        function showAuthMsg(msg, type = 'error') {
+            authMsg.textContent = msg;
+            authMsg.className = 'auth-msg show ' + (type === 'success' ? 'success' : 'error');
+            setTimeout(() => { authMsg.className = 'auth-msg'; }, 5000);
+        }
+
+        function setAuthLoading(state) { authLoader.classList.toggle('show', state); }
+
+        // ============================================
+        // 5. Helpers
+        // ============================================
+        function formatSize(bytes) {
+            if (!bytes) return '0 B';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+            return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+        }
+
+        function formatDate(ts) {
+            if (!ts) return '—';
+            const d = new Date(ts);
+            const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            return `${days[d.getDay()]}، ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function formatTime(ts) {
+            if (!ts) return '—';
+            const d = new Date(ts);
+            const h = String(d.getHours()).padStart(2, '0');
+            const m = String(d.getMinutes()).padStart(2, '0');
+            return `${h}:${m}`;
+        }
+
+        function timeAgo(ts) {
+            if (!ts) return '—';
+            const diff = Date.now() - ts;
+            const sec = Math.floor(diff / 1000);
+            if (sec < 60) return 'الآن';
+            const min = Math.floor(sec / 60);
+            if (min < 60) return 'منذ ' + min + ' دقيقة';
+            const hr = Math.floor(min / 60);
+            if (hr < 24) return 'منذ ' + hr + ' ساعة';
+            const day = Math.floor(hr / 24);
+            if (day < 30) return 'منذ ' + day + ' يوم';
+            return formatDate(ts);
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function copyToClipboard(text, successMsg) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text)
+                    .then(() => showToast(successMsg, 'success', 'تم النسخ'))
+                    .catch(() => fallbackCopy(text, successMsg));
+            } else fallbackCopy(text, successMsg);
+        }
+
+        function fallbackCopy(text, successMsg) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg, 'success', 'تم النسخ');
+            } catch (e) { showToast('فشل النسخ', 'error'); }
+            ta.remove();
+        }
+
+        function getInitial(txt) {
+            if (!txt) return '؟';
+            return txt.trim().charAt(0).toUpperCase();
+        }
+
+        // ============================================
+        // 6. Tabs
+        // ============================================
+        $('tabLogin').addEventListener('click', () => {
+            $('tabLogin').classList.add('active');
+            $('tabSignup').classList.remove('active');
+            $('loginForm').style.display = 'block';
+            $('signupForm').style.display = 'none';
+        });
+        $('tabSignup').addEventListener('click', () => {
+            $('tabSignup').classList.add('active');
+            $('tabLogin').classList.remove('active');
+            $('signupForm').style.display = 'block';
+            $('loginForm').style.display = 'none';
+        });
+
+        // ============================================
+        // 7. Login
+        // ============================================
+        $('loginBtn').addEventListener('click', async () => {
+            const email = $('loginEmail').value.trim();
+            const password = $('loginPassword').value;
+
+            if (!email || !password) { showAuthMsg('⚠️ أدخل البريد وكلمة السر'); return; }
+
+            setAuthLoading(true);
+            try {
+                await AUTH.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                await AUTH.signInWithEmailAndPassword(email, password);
+                showAuthMsg('✅ تم تسجيل الدخول', 'success');
+            } catch (err) {
+                let msg = '❌ خطأ في تسجيل الدخول';
+                if (err.code === 'auth/user-not-found') msg = '❌ لا يوجد حساب بهذا البريد';
+                else if (err.code === 'auth/wrong-password') msg = '❌ كلمة السر غير صحيحة';
+                else if (err.code === 'auth/invalid-email') msg = '❌ البريد غير صحيح';
+                else if (err.code === 'auth/too-many-requests') msg = '⚠️ محاولات كثيرة، حاول لاحقاً';
+                else if (err.code === 'auth/invalid-credential') msg = '❌ البريد أو كلمة السر غير صحيحة';
+                showAuthMsg(msg);
+            } finally { setAuthLoading(false); }
+        });
+
+        // ============================================
+        // 8. Signup
+        // ============================================
+        $('signupBtn').addEventListener('click', async () => {
+            const name = $('signupName').value.trim();
+            const email = $('signupEmail').value.trim();
+            const password = $('signupPassword').value;
+            const confirm = $('signupPasswordConfirm').value;
+
+            if (!name) { showAuthMsg('⚠️ أدخل الاسم'); return; }
+            if (!email || !password || !confirm) { showAuthMsg('⚠️ املأ جميع الحقول'); return; }
+            if (password.length < 6) { showAuthMsg('⚠️ كلمة السر 6 أحرف على الأقل'); return; }
+            if (password !== confirm) { showAuthMsg('⚠️ كلمتا السر غير متطابقتين'); return; }
+
+            setAuthLoading(true);
+            try {
+                const cred = await AUTH.createUserWithEmailAndPassword(email, password);
+                if (cred.user) {
+                    await DB.ref('users/' + cred.user.uid + '/profile').set({
+                        uid: cred.user.uid,
+                        email: email,
+                        name: name,
+                        createdAt: Date.now(),
+                        provider: 'email'
+                    });
+                }
+                showAuthMsg('✅ تم إنشاء الحساب بنجاح', 'success');
+            } catch (err) {
+                let msg = '❌ خطأ في إنشاء الحساب';
+                if (err.code === 'auth/email-already-in-use') msg = '❌ البريد مستخدم بالفعل';
+                else if (err.code === 'auth/weak-password') msg = '⚠️ كلمة السر ضعيفة';
+                else if (err.code === 'auth/invalid-email') msg = '❌ البريد غير صحيح';
+                showAuthMsg(msg);
+            } finally { setAuthLoading(false); }
+        });
+
+        // ============================================
+        // 9. Forgot password
+        // ============================================
+        $('forgotBtn').addEventListener('click', async () => {
+            const email = $('loginEmail').value.trim();
+            if (!email) { showAuthMsg('⚠️ اكتب بريدك أولاً'); return; }
+            try {
+                await AUTH.sendPasswordResetEmail(email);
+                showAuthMsg('✅ تم إرسال رابط إعادة التعيين', 'success');
+            } catch (err) { showAuthMsg('❌ تعذر الإرسال'); }
+        });
+
+        // ============================================
+        // 10. Google login
+        // ============================================
+        $('googleBtn').addEventListener('click', async () => {
+            setAuthLoading(true);
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
+                const result = await AUTH.signInWithPopup(provider);
+
+                if (result.user) {
+                    const snap = await DB.ref('users/' + result.user.uid + '/profile').once('value');
+                    if (!snap.exists()) {
+                        await DB.ref('users/' + result.user.uid + '/profile').set({
+                            uid: result.user.uid,
+                            email: result.user.email,
+                            name: result.user.displayName || result.user.email.split('@')[0],
+                            photo: result.user.photoURL || null,
+                            createdAt: Date.now(),
+                            provider: 'google'
+                        });
+                    }
+                }
+            } catch (err) {
+                if (err.code !== 'auth/popup-closed-by-user') showAuthMsg('❌ فشل الدخول بجوجل');
+            } finally { setAuthLoading(false); }
+        });
+
+        // ============================================
+        // 11. Auth state
+        // ============================================
+        AUTH.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                authView.style.display = 'none';
+                appView.style.display = 'flex';
+                loadProfile();
+                loadUserImages();
+            } else {
+                currentUser = null;
+                currentProfile = null;
+                userImages = [];
+                authView.style.display = 'flex';
+                appView.style.display = 'none';
+                $('loginPassword').value = '';
+                $('signupPassword').value = '';
+                $('signupPasswordConfirm').value = '';
+            }
+        });
+
+        // ============================================
+        // 12. Profile
+        // ============================================
+        async function loadProfile() {
+            if (!currentUser) return;
+            const snap = await DB.ref('users/' + currentUser.uid + '/profile').once('value');
+            currentProfile = snap.val() || {};
+
+            const name = currentProfile.name || (currentUser.email ? currentUser.email.split('@')[0] : 'مستخدم');
+            const initial = getInitial(name);
+
+            $('greetingText').textContent = 'مرحباً، ' + name;
+            $('profileBtn').textContent = initial;
+            $('avatarBig').textContent = initial;
+            $('profileEmail').textContent = currentUser.email || '—';
+            $('profileName').textContent = name;
+            $('profileCreated').textContent = currentProfile.createdAt ? formatDate(currentProfile.createdAt) : '—';
+            $('profileUid').textContent = currentUser.uid;
+            $('editNameInput').value = name;
+        }
+
+        // ============================================
+        // 13. Load images
+        // ============================================
+        function loadUserImages() {
+            if (!currentUser) return;
+
+            DB.ref('users/' + currentUser.uid + '/images').on('value', snapshot => {
+                const data = snapshot.val() || {};
+                userImages = Object.keys(data).map(k => ({ id: k, ...data[k] }))
+                    .sort((a, b) => (b.uploadedAt || 0) - (a.uploadedAt || 0));
+                renderGallery();
+                renderHistory();
+                updateStats();
+            }, err => {
+                console.error('Load error:', err);
+                showToast('فشل تحميل الصور', 'error');
+            });
+        }
+
+        // ============================================
+        // 14. Gallery
+        // ============================================
+        function renderGallery() {
+            const gallery = $('gallery');
+
+            if (userImages.length === 0) {
+                gallery.innerHTML = `<div class="empty">
+                    <span class="big">📭</span>
+                    <p>لا توجد صور بعد</p>
+                </div>`;
+                $('galleryCount').textContent = '0';
+                return;
+            }
+
+            gallery.innerHTML = userImages.map((img, i) => `
+                <div class="gallery-item" onclick="openImage('${img.url}')">
+                    ${i === 0 ? '<div class="ribbon">جديد</div>' : ''}
+                    <img src="${img.thumb || img.url}" alt="${escapeHtml(img.name || '')}" loading="lazy"
+                         onerror="this.src='${img.url}'">
+                    <div class="overlay">
+                        <div class="name">${escapeHtml(img.name || 'صورة')}</div>
+                        <div class="size">${formatSize(img.size || 0)}</div>
+                        <div class="actions">
+                            <button onclick="event.stopPropagation(); copyImageUrl('${img.url}')">📋</button>
+                            <button onclick="event.stopPropagation(); openImage('${img.url}')">🔗</button>
+                            <button class="del" onclick="event.stopPropagation(); deleteImage('${img.id}')">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            $('galleryCount').textContent = userImages.length;
+        }
+
+        window.openImage = url => window.open(url, '_blank');
+        window.copyImageUrl = url => copyToClipboard(url, 'تم نسخ الرابط');
+
+        window.deleteImage = async id => {
+            if (!currentUser) return;
+            if (!confirm('تأكيد حذف هذه الصورة من سجلك؟')) return;
+            try {
+                await DB.ref('users/' + currentUser.uid + '/images/' + id).remove();
+                showToast('تم الحذف من سجلك', 'success', 'حذف');
+            } catch (err) {
+                console.error(err);
+                showToast('فشل الحذف', 'error');
+            }
+        };
+
+        // ============================================
+        // 15. History
+        // ============================================
+        function renderHistory() {
+            const list = $('historyList');
+
+            if (userImages.length === 0) {
+                list.innerHTML = `<div class="empty">
+                    <span class="big">📭</span>
+                    <p>لا يوجد سجل بعد</p>
+                </div>`;
+                $('historyCount').textContent = '0';
+                return;
+            }
+
+            list.innerHTML = userImages.slice(0, 20).map(img => `
+                <div class="history-row" onclick="openImage('${img.url}')">
+                    <div class="h-icon">🖼️</div>
+                    <div class="h-info">
+                        <div class="h-title">${escapeHtml(img.name || 'صورة')}</div>
+                        <div class="h-meta">
+                            <span>📅 ${timeAgo(img.uploadedAt)}</span>
+                            <span>💾 ${formatSize(img.size || 0)}</span>
+                        </div>
+                    </div>
+                    <div class="h-status">ناجح</div>
+                </div>
+            `).join('');
+
+            $('historyCount').textContent = userImages.length;
+        }
+
+        // ============================================
+        // 16. Stats
+        // ============================================
+        function updateStats() {
+            const total = userImages.length;
+            const totalSize = userImages.reduce((s, i) => s + (i.size || 0), 0);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const todayCount = userImages.filter(i => (i.uploadedAt || 0) >= today.getTime()).length;
+            const days = new Set(userImages.map(i => {
+                const d = new Date(i.uploadedAt || 0);
+                return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+            }));
+
+            $('statImages').textContent = total;
+            $('statSize').textContent = formatSize(totalSize);
+            $('statToday').textContent = todayCount;
+            $('statDays').textContent = days.size;
+        }
+
+        // ============================================
+        // 17. File selection
+        // ============================================
+        const dropZone = $('dropZone');
+        const fileInput = $('fileInput');
+        const preview = $('preview');
+        const previewImg = $('previewImg');
+        const removeBtn = $('removeBtn');
+        const infoRow = $('infoRow');
+        const fileName = $('fileName');
+        const fileSize = $('fileSize');
+        const uploadBtn = $('uploadBtn');
+        const loader = $('loader');
+        const result = $('result');
+        const resultTitle = $('resultTitle');
+        const resultUrl = $('resultUrl');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showToast('الرجاء اختيار ملف صورة', 'error');
+                return;
+            }
+            if (file.size > 32 * 1024 * 1024) {
+                showToast('حجم الصورة يتجاوز 32 ميجابايت', 'error');
+                return;
+            }
+
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = e => {
+                previewImg.src = e.target.result;
+                preview.classList.add('show');
+                fileName.textContent = '📎 ' + (file.name.length > 25 ? file.name.substring(0, 25) + '...' : file.name);
+                fileSize.textContent = '💾 ' + formatSize(file.size);
+                infoRow.style.display = 'flex';
+                uploadBtn.disabled = false;
+                result.classList.remove('show');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        removeBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            preview.classList.remove('show');
+            infoRow.style.display = 'none';
+            uploadBtn.disabled = true;
+            result.classList.remove('show');
+        });
+
+        // ============================================
+        // 18. Upload
+        // ============================================
+        uploadBtn.addEventListener('click', async () => {
+            if (!currentUser || !selectedFile) return;
+
+            loader.classList.add('show');
+            uploadBtn.disabled = true;
+            result.classList.remove('show');
+
+            try {
+                const formData = new FormData();
+                formData.append('image', selectedFile);
+
+                const res = await fetch(`${IMGBB_URL}?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (!data.success || !data.data?.url) {
+                    throw new Error(data.error?.message || 'فشل الرفع');
+                }
+
+                uploadedUrl = data.data.url;
+
+                const imageId = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                const imageData = {
+                    id: imageId,
+                    url: uploadedUrl,
+                    thumb: data.data.thumb?.url || uploadedUrl,
+                    name: selectedFile.name,
+                    size: selectedFile.size,
+                    type: selectedFile.type,
+                    uploadedAt: Date.now(),
+                    width: data.data.width || 0,
+                    height: data.data.height || 0
+                };
+
+                await DB.ref('users/' + currentUser.uid + '/images/' + imageId).set(imageData);
+
+                resultUrl.textContent = uploadedUrl;
+                resultTitle.textContent = '✅ تم الرفع والحفظ في حسابك!';
+                result.className = 'result show';
+
+                showToast('تم رفع الصورة وحفظها في حسابك', 'success', 'رفع ناجح');
+
+                selectedFile = null;
+                fileInput.value = '';
+                preview.classList.remove('show');
+                infoRow.style.display = 'none';
+                uploadBtn.disabled = true;
+
+            } catch (err) {
+                console.error(err);
+                resultTitle.textContent = '❌ فشل: ' + (err.message || 'حاول مجدداً');
+                result.className = 'result error show';
+                resultUrl.textContent = '';
+                showToast(err.message || 'فشل الرفع', 'error');
+            } finally {
+                loader.classList.remove('show');
+                uploadBtn.disabled = !selectedFile;
+            }
+        });
+
+        // ============================================
+        // 19. Copy / Open / IMG
+        // ============================================
+        window.copyUrl = () => {
+            if (!uploadedUrl) return;
+            copyToClipboard(uploadedUrl, 'تم نسخ الرابط');
+        };
+        window.openUrl = () => {
+            if (uploadedUrl) window.open(uploadedUrl, '_blank');
+        };
+        window.copyImgTag = () => {
+            if (!uploadedUrl) return;
+            const tag = `<img src="${uploadedUrl}" alt="صورة" style="max-width:100%;height:auto;border-radius:12px;">`;
+            copyToClipboard(tag, 'تم نسخ وسم IMG');
+        };
+
+        // ============================================
+        // 20. Tabs switching
+        // ============================================
+        function switchView(view) {
+            document.querySelectorAll('.tab-pill').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+
+            $('sectionUpload').style.display = view === 'upload' ? 'block' : 'none';
+            $('sectionGallery').style.display = view === 'gallery' ? 'block' : 'none';
+            $('sectionHistory').style.display = view === 'history' ? 'block' : 'none';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.tab-pill').forEach(btn => {
+            btn.addEventListener('click', () => switchView(btn.dataset.view));
+        });
+        document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
+            btn.addEventListener('click', () => switchView(btn.dataset.view));
+        });
+        $('navFab').addEventListener('click', () => switchView('upload'));
+        $('navProfile').addEventListener('click', () => {
+            $('profileModal').classList.add('show');
+            $('currentPassInput').value = '';
+            $('newPassInput').value = '';
+            $('newPassConfirmInput').value = '';
+        });
+
+        // ============================================
+        // 21. Profile modal
+        // ============================================
+        $('profileBtn').addEventListener('click', () => {
+            $('profileModal').classList.add('show');
+            $('currentPassInput').value = '';
+            $('newPassInput').value = '';
+            $('newPassConfirmInput').value = '';
+        });
+        $('profileCloseBtn').addEventListener('click', () => $('profileModal').classList.remove('show'));
+        $('profileModal').addEventListener('click', e => {
+            if (e.target === $('profileModal')) $('profileModal').classList.remove('show');
+        });
+
+        $('saveNameBtn').addEventListener('click', async () => {
+            const newName = $('editNameInput').value.trim();
+            if (!newName) { showToast('أدخل الاسم', 'error'); return; }
+            if (newName.length > 30) { showToast('الاسم طويل جداً', 'error'); return; }
+
+            try {
+                await DB.ref('users/' + currentUser.uid + '/profile/name').set(newName);
+                currentProfile.name = newName;
+                const initial = getInitial(newName);
+                $('greetingText').textContent = 'مرحباً، ' + newName;
+                $('profileBtn').textContent = initial;
+                $('avatarBig').textContent = initial;
+                $('profileName').textContent = newName;
+                showToast('تم حفظ الاسم', 'success', 'حفظ');
+            } catch (err) {
+                console.error(err);
+                showToast('فشل الحفظ', 'error');
+            }
+        });
+
+        $('changePassBtn').addEventListener('click', async () => {
+            const cur = $('currentPassInput').value;
+            const np = $('newPassInput').value;
+            const npc = $('newPassConfirmInput').value;
+
+            if (!cur || !np || !npc) { showToast('املأ جميع الحقول', 'error'); return; }
+            if (np.length < 6) { showToast('كلمة السر 6 أحرف على الأقل', 'error'); return; }
+            if (np !== npc) { showToast('كلمتا السر غير متطابقتين', 'error'); return; }
+
+            try {
+                const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, cur);
+                await currentUser.reauthenticateWithCredential(cred);
+                await currentUser.updatePassword(np);
+                $('currentPassInput').value = '';
+                $('newPassInput').value = '';
+                $('newPassConfirmInput').value = '';
+                showToast('تم تغيير كلمة المرور', 'success', 'نجاح');
+            } catch (err) {
+                console.error(err);
+                if (err.code === 'auth/wrong-password') showToast('كلمة السر الحالية خاطئة', 'error');
+                else if (err.code === 'auth/requires-recent-login') showToast('يرجى إعادة تسجيل الدخول', 'warning');
+                else showToast('فشل تغيير كلمة المرور', 'error');
+            }
+        });
+
+        $('logoutBtnModal').addEventListener('click', async () => {
+            if (!confirm('هل تريد تسجيل الخروج؟')) return;
+            $('profileModal').classList.remove('show');
+            await AUTH.signOut();
+            showToast('تم تسجيل الخروج', 'info');
+        });
+
+        $('refreshBtn').addEventListener('click', () => {
+            if (currentUser) {
+                loadProfile();
+                loadUserImages();
+                showToast('تم التحديث', 'info');
+            }
+        });
+
+        // Enter shortcuts
+        ['loginEmail', 'loginPassword'].forEach(id => {
+            $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
+        });
+        ['signupName', 'signupEmail', 'signupPassword', 'signupPasswordConfirm'].forEach(id => {
+            $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('signupBtn').click(); });
+        });
+
+        console.log('🚀 ImageHub Ready');
+    </script>
+</body>
+</html>
